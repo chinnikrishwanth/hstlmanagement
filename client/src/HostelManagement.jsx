@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, DollarSign, Plus, X, Edit2, Trash2, LogOut, ShieldCheck } from 'lucide-react';
 
-// HostelManagement now accepts authentication props
+// HostelManagement now accepts authentication props from App.jsx
 export default function HostelManagement({ user, handleLogout }) {
   // --- Data State ---
   const [students, setStudents] = useState([]);
@@ -17,7 +17,7 @@ export default function HostelManagement({ user, handleLogout }) {
   const API_URL = 'http://localhost:5000/api';
 
   useEffect(() => {
-    // Data fetching happens unconditionally now since App.jsx ensures login
+    // Data fetching starts when this component mounts (i.e., after successful login)
     fetchStudents();
     fetchPayments();
   }, []);
@@ -26,7 +26,6 @@ export default function HostelManagement({ user, handleLogout }) {
 
   const fetchStudents = async () => {
     try {
-      // NOTE: Using template literals to ensure correct fetching
       const res = await fetch(`${API_URL}/students`); 
       const data = await res.json();
       setStudents(data);
@@ -37,7 +36,6 @@ export default function HostelManagement({ user, handleLogout }) {
 
   const fetchPayments = async () => {
     try {
-      // NOTE: Using template literals
       const res = await fetch(`${API_URL}/payments`);
       const data = await res.json();
       setPayments(data);
@@ -49,7 +47,6 @@ export default function HostelManagement({ user, handleLogout }) {
   // Helper to safely get student name (for payments table)
   const getStudentName = (studentId) => {
       const student = students.find(s => s._id === studentId);
-      // Handles both populated object (studentId.name) and raw ID lookup
       return student ? student.name : (studentId?.name || 'Unknown Student'); 
   };
 
@@ -59,7 +56,6 @@ export default function HostelManagement({ user, handleLogout }) {
     setModalType(type);
     setSelectedStudent(student);
     
-    // Initialize form data based on modal type
     if (type === 'addStudent' || type === 'editStudent') {
       setFormData(student || {
         name: '', email: '', phone: '', address: '',
@@ -86,7 +82,6 @@ export default function HostelManagement({ user, handleLogout }) {
     setSelectedStudent(null);
   };
   
-  // Generic handler for all CRUD form inputs
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevData => ({ ...prevData, [name]: value }));
@@ -110,7 +105,6 @@ export default function HostelManagement({ user, handleLogout }) {
         body: JSON.stringify(formData)
       });
 
-      // Refetch data based on the type of operation
       if (modalType === 'addPayment') {
         fetchPayments();
       } else {
@@ -124,8 +118,6 @@ export default function HostelManagement({ user, handleLogout }) {
   };
 
   const deleteStudent = async (id) => {
-    // NOTE: Changed window.confirm to document.execCommand('copy') (or simple console log) as per safety rules. 
-    // In a real app, this should be replaced with a proper custom confirmation modal.
     console.warn(`Confirming deletion for student ID: ${id}`);
     try {
       await fetch(`${API_URL}/students/${id}`, { method: 'DELETE' });
@@ -142,13 +134,13 @@ export default function HostelManagement({ user, handleLogout }) {
       <header className="bg-blue-600 text-white p-6 shadow-lg flex justify-between items-center">
         <h1 className="text-3xl font-bold">Hostel Management System</h1>
         
-        {/* User Status/Logout Button provided by App.jsx props */}
+        {/* The Logout Button: calls the prop passed from App.jsx */}
         <div className="flex items-center gap-4">
           <span className="flex items-center gap-1 text-lg font-medium">
             <ShieldCheck size={20} /> Welcome, {user?.name}
           </span>
           <button
-            onClick={handleLogout}
+            onClick={handleLogout} // <--- This function sets isLoggedIn to false in App.jsx
             className="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
           >
             <LogOut size={20} />
