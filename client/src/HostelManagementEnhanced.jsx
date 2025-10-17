@@ -677,3 +677,4 @@ export default function HostelManagement({ user, handleLogout }) {
   );
 }
 
+
