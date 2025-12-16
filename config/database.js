@@ -3,10 +3,8 @@ require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    // Prioritize local MongoDB over Atlas
-    const mongoURI = process.env.MONGOLINK && process.env.MONGOLINK.includes('localhost') 
-      ? process.env.MONGOLINK 
-      : 'mongodb://localhost:27017/hostel_management';
+    // Use MONGOLINK if provided, otherwise fallback to localhost for development
+    const mongoURI = process.env.MONGOLINK || 'mongodb://localhost:27017/hostel_management';
     
     console.log('Attempting to connect to MongoDB...');
     console.log('Using URI:', mongoURI.replace(/\/\/.*@/, '//***:***@')); // Hide credentials in logs

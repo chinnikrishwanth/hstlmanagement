@@ -21,12 +21,31 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Root route - ADD THIS
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Student Management API',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      students: '/api/students',
+      payments: '/api/payments',
+      auth: '/api/auth'
+    }
+  });
+});
+
+// Health check route - useful for monitoring
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// API Routes
 app.use('/api/students', studentRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/auth', authRoutes);
 
-// Error handling middleware
+// Error handling middleware (must be last)
 app.use(notFound);
 app.use(errorHandler);
 
